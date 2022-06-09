@@ -28,6 +28,7 @@ public class H264Decoder {
 
     public void decodeFrame(byte[] data) {
         Log.i(TAG, "接收到消息: " + data.length);
+        YuvUtils.writeBytes(data);
         int index= mediaCodec.dequeueInputBuffer(100000);
         if (index >= 0) {
             ByteBuffer inputBuffer = mediaCodec.getInputBuffer(index);

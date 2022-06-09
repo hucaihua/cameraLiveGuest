@@ -35,8 +35,10 @@ public class YuvUtils {
         int  size = nv21.length;
         nv12 = new byte[size];
         int len = size * 2 / 3;
+        // copy y
         System.arraycopy(nv21, 0, nv12, 0, len);
         int i = len;
+        //交换vu --> uv
         while(i < size - 1){
             nv12[i] = nv21[i + 1];
             nv12[i + 1] = nv21[i];

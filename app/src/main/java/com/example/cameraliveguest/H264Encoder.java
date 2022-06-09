@@ -6,7 +6,6 @@ import android.media.MediaFormat;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class H264Encoder{
     SocketLive socketLive;
@@ -36,8 +35,8 @@ public class H264Encoder{
             ByteBuffer[] byteBuffers = mediaCodec.getInputBuffers();
             ByteBuffer inputBuffer = byteBuffers[inputBufferIndex];
             inputBuffer.clear();
-            inputBuffer.put(input);
-            mediaCodec.queueInputBuffer(inputBufferIndex, 0, input.length, System.currentTimeMillis(), 0);
+            inputBuffer.put(yuv);
+            mediaCodec.queueInputBuffer(inputBufferIndex, 0, yuv.length, System.currentTimeMillis(), 0);
         }
 
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
@@ -77,12 +76,6 @@ public class H264Encoder{
             offset = 3;
         }
 
-//        byte[] testBuffer = new byte[bufferSize];
-//        Log.d("hucaihua", "帧大小--->  " + testBuffer.length);
-//        outputBuffer.get(testBuffer);
-//        FileUtil.writeContent(testBuffer);
-
-
         //找出当前帧的类型 , 分隔符00000001/000001后面的一个字节为配置信息，最后5位为帧类型
         //如果是sps/pps帧，则保存信息。
         if (sps_pps == null){
@@ -99,14 +92,15 @@ public class H264Encoder{
             System.arraycopy(sps_pps, 0, newBuf, 0, sps_pps.length);
             System.arraycopy(iFrame, 0, newBuf, sps_pps.length, iFrame.length);
             socketLive.sendData(newBuf);
-            Log.v("david", "I帧大小--->  " + iFrame.length);
+            Log.d("hucaihua", "帧大小--->  " + iFrame.length);
+//            YuvUtils.writeBytes(newBuf);
         }
         // 其他帧，直接发送
         else{
             final byte[] otherFrame = new byte[bufferSize];
             outputBuffer.get(otherFrame);
             socketLive.sendData(otherFrame);
-//            Log.v("david", "视频数据  " + Arrays.toString(otherFrame));
+//            YuvUtils.writeBytes(otherFrame);
         }
     }
 }
